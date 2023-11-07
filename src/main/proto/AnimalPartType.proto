@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package dk.via.slaughterhouse.protobuf.animalparttype;
+option java_multiple_files = true;
+
+service AnimalPartTypeService {
+  rpc createAnimalPartType(CreateAnimalPartTypeRequest) returns (CreateAnimalPartTypeResponse);
+  rpc getAnimalPartType(GetAnimalPartTypeRequest) returns (GetAnimalPartTypeResponse);
+}
+
+message CreateAnimalPartTypeRequest {
+  string name = 1;
+  string description = 2;
+}
+
+message CreateAnimalPartTypeResponse {
+  string confirmation = 1;
+}
+
+message GetAnimalPartTypeRequest {
+  int64 id = 1;
+}
+
+message GetAnimalPartTypeResponse {
+  int64 id = 1;
+  string name = 2;
+  string description = 3;
+}

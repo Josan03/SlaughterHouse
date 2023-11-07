@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+package dk.via.slaughterhouse.protobuf.animal;
+option java_multiple_files = true;
+
+service AnimalService {
+  rpc createAnimal(CreateAnimalRequest) returns (CreateAnimalResponse);
+  rpc getAnimal(GetAnimalRequest) returns (GetAnimalResponse);
+  rpc getAnimalIds(GetAnimalIdsRequest) returns (GetAnimalIdsResponse);
+}
+
+message CreateAnimalRequest {
+  int64 animalTypeId = 1;
+  double weight = 2;
+  string registrationDate = 3;
+}
+
+message CreateAnimalResponse {
+  string confirmation = 1;
+}
+
+message GetAnimalRequest {
+  int64 animalId = 1;
+}
+
+message GetAnimalResponse {
+  int64 animalId = 1;
+  int64 animalTypeId = 2;
+  double weight = 3;
+  string registrationDate = 4;
+}
+
+message GetAnimalIdsRequest {
+  int64 productId = 1;
+}
+
+message GetAnimalIdsResponse {
+  repeated int64 animalIds = 1;
+}

@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+package dk.via.slaughterhouse.protobuf.product;
+option java_multiple_files = true;
+
+service ProductService {
+  rpc createProduct(CreateProductRequest) returns (CreateProductResponse);
+  rpc getProduct(GetProductRequest) returns (GetProductResponse);
+  rpc getProductIds(GetProductIdsRequest) returns (GetProductIdsResponse);
+}
+
+message CreateProductRequest {
+  string name = 1;
+  string description = 2;
+  int64 trayId = 3;
+}
+
+message CreateProductResponse {
+  string confirmation = 1;
+}
+
+message GetProductRequest {
+  int64 id = 1;
+}
+
+message GetProductResponse {
+  int64 id = 1;
+  string name = 2;
+  string description = 3;
+  repeated int64 animalPartsIds = 4;
+  int64 trayId = 5;
+}
+
+message GetProductIdsRequest {
+  int64 animalId = 1;
+}
+
+message GetProductIdsResponse {
+  repeated int64 productIds = 1;
+}
