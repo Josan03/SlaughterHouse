@@ -1,25 +1,23 @@
 package dk.via.slaughterhouse.service;
 
+import dk.via.slaughterhouse.dao.interfaces.TrayDAO;
 import dk.via.slaughterhouse.model.Tray;
 import dk.via.slaughterhouse.protobuf.tray.*;
-import dk.via.slaughterhouse.repository.TrayRepository;
 import io.grpc.stub.StreamObserver;
 import org.lognet.springboot.grpc.GRpcService;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.Optional;
-
 @GRpcService
 public class TrayServiceImpl extends TrayServiceGrpc.TrayServiceImplBase {
     @Autowired
-    private TrayRepository trayRepository;
+    private TrayDAO trayDAO;
 
     @Override
     public void createTray(CreateTrayRequest request, StreamObserver<CreateTrayResponse> responseObserver) {
         Tray tray = new Tray();
         tray.setDescription(request.getDescription());
         tray.setMaxWeight(request.getMaxWeight());
-        Tray resTray = trayRepository.save(tray);
+        Tray resTray = trayDAO.createTray(tray);
 
         CreateTrayResponse.Builder builder = CreateTrayResponse.newBuilder();
 
@@ -36,12 +34,12 @@ public class TrayServiceImpl extends TrayServiceGrpc.TrayServiceImplBase {
 
     @Override
     public void getTray(GetTrayRequest request, StreamObserver<GetTrayResponse> responseObserver) {
-        Optional<Tray> tray = trayRepository.findById(request.getId());
+        Tray tray = trayDAO.getTray(request.getId());
 
         GetTrayResponse.Builder builder = GetTrayResponse.newBuilder();
-        builder.setId(tray.get().getId());
-        builder.setDescription(tray.get().getDescription());
-        builder.setMaxWeight(tray.get().getMaxWeight());
+        builder.setId(tray.getId());
+        builder.setDescription(tray.getDescription());
+        builder.setMaxWeight(tray.getMaxWeight());
 
         GetTrayResponse res = builder.build();
         responseObserver.onNext(res);

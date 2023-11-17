@@ -1,20 +1,19 @@
 package dk.via.slaughterhouse.service;
 
+import dk.via.slaughterhouse.dao.interfaces.AnimalDAO;
 import dk.via.slaughterhouse.model.Animal;
 import dk.via.slaughterhouse.model.AnimalType;
 import dk.via.slaughterhouse.protobuf.animal.*;
-import dk.via.slaughterhouse.repository.AnimalRepository;
 import io.grpc.stub.StreamObserver;
 import org.lognet.springboot.grpc.GRpcService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
-import java.util.Optional;
 
 @GRpcService
 public class AnimalServiceImpl extends AnimalServiceGrpc.AnimalServiceImplBase {
     @Autowired
-    private AnimalRepository animalRepository;
+    private AnimalDAO animalDAO;
 
     @Override
     public void createAnimal(CreateAnimalRequest request, StreamObserver<CreateAnimalResponse> responseObserver) {
@@ -24,7 +23,7 @@ public class AnimalServiceImpl extends AnimalServiceGrpc.AnimalServiceImplBase {
         animal.setAnimalType(animalType);
         animal.setWeight(request.getWeight());
         animal.setRegistrationDate(request.getRegistrationDate());
-        Animal resAnimal = animalRepository.save(animal);
+        Animal resAnimal = animalDAO.createAnimal(animal);
 
         CreateAnimalResponse.Builder builder = CreateAnimalResponse.newBuilder();
         if (resAnimal == null) {
@@ -40,15 +39,15 @@ public class AnimalServiceImpl extends AnimalServiceGrpc.AnimalServiceImplBase {
 
     @Override
     public void getAnimal(GetAnimalRequest request, StreamObserver<GetAnimalResponse> responseObserver) {
-        Optional<Animal> animal = animalRepository.findById(request.getAnimalId());
+        Animal animal = animalDAO.getAnimal(request.getAnimalId());
         AnimalType animalType = new AnimalType();
-        animalType.setId(animal.get().getAnimalType().getId());
+        animalType.setId(animal.getAnimalType().getId());
 
         GetAnimalResponse.Builder builder = GetAnimalResponse.newBuilder();
-        builder.setAnimalId(animal.get().getId());
-        builder.setAnimalTypeId(animal.get().getAnimalType().getId());
-        builder.setWeight(animal.get().getWeight());
-        builder.setRegistrationDate(animal.get().getRegistrationDate());
+        builder.setAnimalId(animal.getId());
+        builder.setAnimalTypeId(animal.getAnimalType().getId());
+        builder.setWeight(animal.getWeight());
+        builder.setRegistrationDate(animal.getRegistrationDate());
 
         GetAnimalResponse res = builder.build();
         responseObserver.onNext(res);
@@ -57,7 +56,7 @@ public class AnimalServiceImpl extends AnimalServiceGrpc.AnimalServiceImplBase {
 
     @Override
     public void getAnimalIds(GetAnimalIdsRequest request, StreamObserver<GetAnimalIdsResponse> responseObserver) {
-        List<Long> list = animalRepository.findAnimalIdsByProductId(request.getProductId());
+        List<Long> list = animalDAO.findAnimalIdsByProductId(request.getProductId());
 
         GetAnimalIdsResponse.Builder builder = GetAnimalIdsResponse.newBuilder();
 

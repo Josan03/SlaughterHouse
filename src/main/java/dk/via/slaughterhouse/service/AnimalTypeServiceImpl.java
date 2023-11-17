@@ -1,18 +1,17 @@
 package dk.via.slaughterhouse.service;
 
+import dk.via.slaughterhouse.dao.interfaces.AnimalTypeDAO;
 import dk.via.slaughterhouse.model.AnimalType;
 import dk.via.slaughterhouse.protobuf.animaltype.*;
-import dk.via.slaughterhouse.repository.AnimalTypeRepository;
 import io.grpc.stub.StreamObserver;
 import org.lognet.springboot.grpc.GRpcService;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.Optional;
 
 @GRpcService
 public class AnimalTypeServiceImpl extends AnimalTypeServiceGrpc.AnimalTypeServiceImplBase {
     @Autowired
-    private AnimalTypeRepository animalTypeRepository;
+    private AnimalTypeDAO animalTypeDAO;
 
     @Override
     public void createAnimalType(CreateAnimalTypeRequest request, StreamObserver<CreateAnimalTypeResponse> responseObserver) {
@@ -20,7 +19,7 @@ public class AnimalTypeServiceImpl extends AnimalTypeServiceGrpc.AnimalTypeServi
         animalType.setName(request.getName());
         animalType.setDescription(request.getDescription());
 
-        AnimalType resAnimalType = animalTypeRepository.save(animalType);
+        AnimalType resAnimalType = animalTypeDAO.createAnimalType(animalType);
 
         CreateAnimalTypeResponse.Builder builder = CreateAnimalTypeResponse.newBuilder();
 
@@ -37,12 +36,12 @@ public class AnimalTypeServiceImpl extends AnimalTypeServiceGrpc.AnimalTypeServi
 
     @Override
     public void getAnimalType(GetAnimalTypeRequest request, StreamObserver<GetAnimalTypeResponse> responseObserver) {
-        Optional<AnimalType> animalType = animalTypeRepository.findById(request.getId());
+        AnimalType animalType = animalTypeDAO.getAnimalType(request.getId());
 
         GetAnimalTypeResponse.Builder builder = GetAnimalTypeResponse.newBuilder();
-        builder.setId(animalType.get().getId());
-        builder.setName(animalType.get().getName());
-        builder.setDescription(animalType.get().getDescription());
+        builder.setId(animalType.getId());
+        builder.setName(animalType.getName());
+        builder.setDescription(animalType.getDescription());
 
         GetAnimalTypeResponse res = builder.build();
         responseObserver.onNext(res);

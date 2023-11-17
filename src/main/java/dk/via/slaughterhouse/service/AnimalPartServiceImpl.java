@@ -1,37 +1,48 @@
 package dk.via.slaughterhouse.service;
 
+import dk.via.slaughterhouse.dao.interfaces.*;
 import dk.via.slaughterhouse.model.*;
 import dk.via.slaughterhouse.model.AnimalPart;
 import dk.via.slaughterhouse.protobuf.animalpart.*;
-import dk.via.slaughterhouse.repository.*;
 import io.grpc.stub.StreamObserver;
 import org.lognet.springboot.grpc.GRpcService;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.Optional;
-
 @GRpcService
 public class AnimalPartServiceImpl extends AnimalPartServiceGrpc.AnimalPartServiceImplBase {
     @Autowired
-    private AnimalPartRepository animalPartRepository;
+    private AnimalPartDAO animalPartDAO;
     @Autowired
-    private AnimalRepository animalRepository;
+    private AnimalDAO animalDAO;
     @Autowired
-    private AnimalPartTypeRepository animalPartTypeRepository;
+    private AnimalPartTypeDAO animalPartTypeDAO;
     @Autowired
-    private TrayRepository trayRepository;
+    private TrayDAO trayDAO;
     @Autowired
-    private ProductRepository productRepository;
+    private ProductDAO productDAO;
 
     @Override
     public void createAnimalPart(CreateAnimalPartRequest request, StreamObserver<CreateAnimalPartResponse> responseObserver) {
         AnimalPart animalPart = new AnimalPart();
         animalPart.setWeight(request.getWeight());
-        animalRepository.findById(request.getAnimalId()).ifPresent(animalPart::setAnimal);
-        animalPartTypeRepository.findById(request.getAnimalPartTypeId()).ifPresent(animalPart::setAnimalPartType);
-        trayRepository.findById(request.getTrayId()).ifPresent(animalPart::setTray);
-        productRepository.findById(request.getProductId()).ifPresent(animalPart::setProduct);
-        AnimalPart resAnimalPart = animalPartRepository.save(animalPart);
+
+        Animal animal = animalDAO.getAnimal(request.getAnimalId());
+        if (animal != null)
+            animalPart.setAnimal(animal);
+
+        AnimalPartType animalPartType = animalPartTypeDAO.getAnimalPartType(request.getAnimalPartTypeId());
+        if (animalPartType != null)
+            animalPart.setAnimalPartType(animalPartType);
+
+        Tray tray = trayDAO.getTray(request.getTrayId());
+        if (tray != null)
+            animalPart.setTray(tray);
+
+        Product product = productDAO.getProduct(request.getProductId());
+        if (product != null)
+            animalPart.setProduct(product);
+
+        AnimalPart resAnimalPart = animalPartDAO.createAnimalPart(animalPart);
 
         CreateAnimalPartResponse.Builder builder = CreateAnimalPartResponse.newBuilder();
         if (resAnimalPart == null) {
@@ -47,11 +58,11 @@ public class AnimalPartServiceImpl extends AnimalPartServiceGrpc.AnimalPartServi
 
     @Override
     public void getAnimalPart(GetAnimalPartRequest request, StreamObserver<GetAnimalPartResponse> responseObserver) {
-        Optional<AnimalPart> animalPart = animalPartRepository.findById(request.getId());
+        AnimalPart animalPart = animalPartDAO.getAnimalPart(request.getId());
         GetAnimalPartResponse.Builder builder = GetAnimalPartResponse.newBuilder();
-        builder.setId(animalPart.get().getId());
-        builder.setWeight(animalPart.get().getWeight());
-        builder.setAnimalId(animalPart.get().getAnimal().getId());
+        builder.setId(animalPart.getId());
+        builder.setWeight(animalPart.getWeight());
+        builder.setAnimalId(animalPart.getAnimal().getId());
         GetAnimalPartResponse res = builder.build();
 
         responseObserver.onNext(res);

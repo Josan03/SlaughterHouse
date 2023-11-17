@@ -1,20 +1,19 @@
 package dk.via.slaughterhouse.service;
 
+import dk.via.slaughterhouse.dao.interfaces.ProductDAO;
 import dk.via.slaughterhouse.model.Product;
 import dk.via.slaughterhouse.model.Tray;
 import dk.via.slaughterhouse.protobuf.product.*;
-import dk.via.slaughterhouse.repository.ProductRepository;
 import io.grpc.stub.StreamObserver;
 import org.lognet.springboot.grpc.GRpcService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
-import java.util.Optional;
 
 @GRpcService
 public class ProductServiceImpl extends ProductServiceGrpc.ProductServiceImplBase {
     @Autowired
-    private ProductRepository productRepository;
+    private ProductDAO productDAO;
 
     @Override
     public void createProduct(CreateProductRequest request, StreamObserver<CreateProductResponse> responseObserver) {
@@ -24,7 +23,7 @@ public class ProductServiceImpl extends ProductServiceGrpc.ProductServiceImplBas
         product.setName(request.getName());
         product.setDescription(request.getDescription());
         product.setTray(tray);
-        Product resProduct = productRepository.save(product);
+        Product resProduct = productDAO.createProduct(product);
 
         CreateProductResponse.Builder builder = CreateProductResponse.newBuilder();
 
@@ -41,14 +40,14 @@ public class ProductServiceImpl extends ProductServiceGrpc.ProductServiceImplBas
 
     @Override
     public void getProduct(GetProductRequest request, StreamObserver<GetProductResponse> responseObserver) {
-        Optional<Product> product = productRepository.findById(request.getId());
+        Product product = productDAO.getProduct(request.getId());
         Tray tray = new Tray();
-        tray.setId(product.get().getTray().getId());
+        tray.setId(product.getTray().getId());
 
         GetProductResponse.Builder builder = GetProductResponse.newBuilder();
-        builder.setId(product.get().getId());
-        builder.setName(product.get().getName());
-        builder.setDescription(product.get().getDescription());
+        builder.setId(product.getId());
+        builder.setName(product.getName());
+        builder.setDescription(product.getDescription());
         builder.setTrayId(tray.getId());
 
         GetProductResponse res = builder.build();
@@ -58,7 +57,7 @@ public class ProductServiceImpl extends ProductServiceGrpc.ProductServiceImplBas
 
     @Override
     public void getProductIds(GetProductIdsRequest request, StreamObserver<GetProductIdsResponse> responseObserver) {
-        List<Long> list = productRepository.findProductIdsByAnimalId(request.getAnimalId());
+        List<Long> list = productDAO.findProductIdsByAnimalId(request.getAnimalId());
 
         GetProductIdsResponse.Builder builder = GetProductIdsResponse.newBuilder();
 

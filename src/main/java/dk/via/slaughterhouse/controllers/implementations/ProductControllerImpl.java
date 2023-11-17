@@ -1,7 +1,8 @@
-package dk.via.slaughterhouse.controllers;
+package dk.via.slaughterhouse.controllers.implementations;
 
 import dk.via.slaughterhouse.client.implementations.ProductClientImpl;
 import dk.via.slaughterhouse.client.interfaces.ProductClient;
+import dk.via.slaughterhouse.controllers.interfaces.ProductController;
 import dk.via.slaughterhouse.dto.ProductDTO;
 import dk.via.slaughterhouse.model.Product;
 import org.springframework.http.HttpStatus;
@@ -12,10 +13,10 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/")
-public class ProductController {
+public class ProductControllerImpl implements ProductController {
     private ProductClient productClient;
 
-    public ProductController() {
+    public ProductControllerImpl() {
         this.productClient = new ProductClientImpl();
     }
 

@@ -1,7 +1,8 @@
-package dk.via.slaughterhouse.controllers;
+package dk.via.slaughterhouse.controllers.implementations;
 
 import dk.via.slaughterhouse.client.implementations.AnimalTypeClientImpl;
 import dk.via.slaughterhouse.client.interfaces.AnimalTypeClient;
+import dk.via.slaughterhouse.controllers.interfaces.AnimalTypeController;
 import dk.via.slaughterhouse.dto.AnimalTypeDTO;
 import dk.via.slaughterhouse.model.AnimalType;
 import org.springframework.http.HttpStatus;
@@ -10,10 +11,10 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/animaltype")
-public class AnimalTypeController {
+public class AnimalTypeControllerImpl implements AnimalTypeController {
     private AnimalTypeClient animalTypeClient;
 
-    public AnimalTypeController() {
+    public AnimalTypeControllerImpl() {
         this.animalTypeClient = new AnimalTypeClientImpl();
     }
 

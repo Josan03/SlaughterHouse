@@ -1,7 +1,8 @@
-package dk.via.slaughterhouse.controllers;
+package dk.via.slaughterhouse.controllers.implementations;
 
 import dk.via.slaughterhouse.client.implementations.AnimalPartClientImpl;
 import dk.via.slaughterhouse.client.interfaces.AnimalPartClient;
+import dk.via.slaughterhouse.controllers.interfaces.AnimalPartController;
 import dk.via.slaughterhouse.dto.AnimalPartDTO;
 import dk.via.slaughterhouse.model.AnimalPart;
 import org.springframework.http.HttpStatus;
@@ -10,10 +11,10 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/animalpart")
-public class AnimalPartController {
+public class AnimalPartControllerImpl implements AnimalPartController {
     private AnimalPartClient animalPartClient;
 
-    public AnimalPartController() {
+    public AnimalPartControllerImpl() {
         this.animalPartClient = new AnimalPartClientImpl();
     }
 

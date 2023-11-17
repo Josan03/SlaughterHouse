@@ -1,7 +1,8 @@
-package dk.via.slaughterhouse.controllers;
+package dk.via.slaughterhouse.controllers.implementations;
 
 import dk.via.slaughterhouse.client.implementations.TrayClientImpl;
 import dk.via.slaughterhouse.client.interfaces.TrayClient;
+import dk.via.slaughterhouse.controllers.interfaces.TrayController;
 import dk.via.slaughterhouse.dto.TrayDTO;
 import dk.via.slaughterhouse.model.Tray;
 import org.springframework.http.HttpStatus;
@@ -10,10 +11,10 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/trays")
-public class TrayController {
+public class TrayControllerImpl implements TrayController {
     private TrayClient trayClient;
 
-    public TrayController() {
+    public TrayControllerImpl() {
         this.trayClient = new TrayClientImpl();
     }
 

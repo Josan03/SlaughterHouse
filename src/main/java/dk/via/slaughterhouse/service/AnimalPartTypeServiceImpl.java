@@ -1,18 +1,16 @@
 package dk.via.slaughterhouse.service;
 
+import dk.via.slaughterhouse.dao.interfaces.AnimalPartTypeDAO;
 import dk.via.slaughterhouse.protobuf.animalparttype.*;
 import dk.via.slaughterhouse.model.AnimalPartType;
-import dk.via.slaughterhouse.repository.AnimalPartTypeRepository;
 import io.grpc.stub.StreamObserver;
 import org.lognet.springboot.grpc.GRpcService;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.Optional;
-
 @GRpcService
 public class AnimalPartTypeServiceImpl extends AnimalPartTypeServiceGrpc.AnimalPartTypeServiceImplBase {
     @Autowired
-    private AnimalPartTypeRepository animalPartTypeRepository;
+    private AnimalPartTypeDAO animalPartTypeDAO;
 
     @Override
     public void createAnimalPartType(CreateAnimalPartTypeRequest request, StreamObserver<CreateAnimalPartTypeResponse> responseObserver) {
@@ -20,7 +18,7 @@ public class AnimalPartTypeServiceImpl extends AnimalPartTypeServiceGrpc.AnimalP
         animalPartType.setName(request.getName());
         animalPartType.setDescription(request.getDescription());
 
-        AnimalPartType resAnimalPartType = animalPartTypeRepository.save(animalPartType);
+        AnimalPartType resAnimalPartType = animalPartTypeDAO.createAnimalPartType(animalPartType);
 
         CreateAnimalPartTypeResponse.Builder builder = CreateAnimalPartTypeResponse.newBuilder();
 
@@ -37,12 +35,12 @@ public class AnimalPartTypeServiceImpl extends AnimalPartTypeServiceGrpc.AnimalP
 
     @Override
     public void getAnimalPartType(GetAnimalPartTypeRequest request, StreamObserver<GetAnimalPartTypeResponse> responseObserver) {
-        Optional<AnimalPartType> animalPartType = animalPartTypeRepository.findById(request.getId());
+        AnimalPartType animalPartType = animalPartTypeDAO.getAnimalPartType(request.getId());
 
         GetAnimalPartTypeResponse.Builder builder = GetAnimalPartTypeResponse.newBuilder();
-        builder.setId(animalPartType.get().getId());
-        builder.setName(animalPartType.get().getName());
-        builder.setDescription(animalPartType.get().getDescription());
+        builder.setId(animalPartType.getId());
+        builder.setName(animalPartType.getName());
+        builder.setDescription(animalPartType.getDescription());
 
         GetAnimalPartTypeResponse res = builder.build();
         responseObserver.onNext(res);
