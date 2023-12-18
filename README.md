@@ -1,7 +1,7 @@
 # SlaughterHouse
 
 <b>General Information</b>
-<p>A rest api and a gRPC system for a slaughterhouse.</p> 
+<p>A rest api and a gRPC technology for a slaughterhouse system.</p> 
 
 <b>Technologies</b>
 <ul>
